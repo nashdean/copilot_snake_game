@@ -11,19 +11,37 @@ This is a classic Snake game implemented in Python using Pygame. The game was cr
 - PyYAML
 
 ### Running the Game
+#### Method 1 - Run Executable (Recommended)
+**Download and Run the Executable**
 
+1. Go to the [Releases](https://github.com/nashdean/copilot_snake_game/releases) page.
+2. Download the latest release for your operating system.
+3. Extract the downloaded archive.
+4. Run the executable file.
+
+For example, on Windows, you can double-click the `main.exe` file to start the game.
+
+#### Method 2 - Clone Repo
 1. **Clone the repository**
-```bash
+```sh
 git clone https://github.com/nashdean/copilot_snake_game.git
 cd copilot_snake_game
 ```
 2. **Install the dependencies**
-```bash
+```sh
 pip install -r requirements.txt
 ```
 3. **Run the game:**
-```bash
+```sh
 python main.py
+```
+4. **(Optional) Building the Executable**
+
+- To build the executable using PyInstaller, follow these steps:
+
+    - **Install PyInstaller**:
+```sh
+pip install pyinstaller
 ```
 
 ### Using Dev Containers
