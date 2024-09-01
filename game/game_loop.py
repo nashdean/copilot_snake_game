@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 from game.display import dis, clock, dis_width, dis_height, start_menu, message
-from game.colors import black, red, blue, green
+from game.colors import black, red, blue, green, white
 from game.snake import our_snake
 from game.fonts import display_score
 from game.obstacles import generate_obstacles, draw_obstacles
@@ -10,6 +10,20 @@ from game.score import Score
 
 
 import random
+
+def pause_game():
+    paused = True
+    message("Game Paused. Press P to Resume", white)
+    pygame.display.update()
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = False
+        clock.tick(5)
 
 def gameLoop():
     game_over = False
@@ -88,6 +102,8 @@ def gameLoop():
                     y1_change = snake_block
                     x1_change = 0
                     current_direction = "DOWN"
+                elif event.key == pygame.K_p:
+                    pause_game()
 
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
             game_close = True
@@ -135,6 +151,13 @@ def gameLoop():
             if length_of_snake - 1 > high_score:
                 high_score = length_of_snake - 1
                 score_manager.add_score(difficulty.__class__.__name__, high_score)
+
+            # Regenerate obstacles and add one new obstacle
+            if len(obstacles) < 150:
+                new_num_obstacles = min(len(obstacles) + 1, 150)
+                new_obstacles = generate_obstacles(snake_block, snake_list, new_num_obstacles)
+                if new_obstacles:
+                    obstacles = new_obstacles
 
         clock.tick(difficulty.speed)
 

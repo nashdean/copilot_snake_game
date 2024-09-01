@@ -9,11 +9,11 @@ class Easy(Difficulty):
 
 class Medium(Difficulty):
     def __init__(self):
-        super().__init__(speed=20, num_obstacles=10)
+        super().__init__(speed=15, num_obstacles=10)
 
 class Hard(Difficulty):
     def __init__(self):
-        super().__init__(speed=30, num_obstacles=15)
+        super().__init__(speed=25, num_obstacles=15)
 
 class Insane(Difficulty):
     def __init__(self):

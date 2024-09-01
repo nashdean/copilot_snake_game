@@ -27,7 +27,7 @@ python main.py
 ```
 
 ### Using Dev Containers
-If you are using Visual Studio Code with Dev Containers, the development environment will be set up automatically. Just open the project in VS Code and select "Reopen in Container" when prompted.
+If you are using Visual Studio Code with Dev Containers, the development environment will be set up automatically. Just open the project in VS Code and select **"Reopen in Container"** when prompted.
 
 # Game Rules
 - The objective of the game is to eat as much food as possible without running into the walls or the snake's own body.
@@ -38,7 +38,7 @@ If you are using Visual Studio Code with Dev Containers, the development environ
 ## How to Play
 1. Start the game:
     - Run the game using the instructions above.
-    - Select the difficulty level from the start menu.
+    - Select the difficulty level from the start menu. There are three levels shown (plus a bonus difficulty).
 2. Control the snake:
     - Use the arrow keys to control the direction of the snake.
     - The snake will move continuously in the direction of the last arrow key pressed.
