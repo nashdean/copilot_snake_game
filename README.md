@@ -37,12 +37,17 @@ python main.py
 ```
 4. **(Optional) Building the Executable**
 
-- To build the executable using PyInstaller, follow these steps:
+**To build the executable using PyInstaller, follow these steps:**
 
-    - **Install PyInstaller**:
+- Install PyInstaller:
 ```sh
 pip install pyinstaller
 ```
+- Run PyInstaller with the spec file:
+```sh
+pyinstaller main.spec
+```
+- This will generate the executable in the `dist` folder.
 
 ### Using Dev Containers
 If you are using Visual Studio Code with Dev Containers, the development environment will be set up automatically. Just open the project in VS Code and select **"Reopen in Container"** when prompted.
