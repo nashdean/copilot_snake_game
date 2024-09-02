@@ -2,11 +2,13 @@ import pygame
 import time
 import random
 from game.display import dis, clock, dis_width, dis_height, start_menu, message, game_over_message
-from game.colors import black, red, blue, green, white
+from game.colors import black, red, blue, green, white, themes
 from game.snake import our_snake
 from game.fonts import display_score
 from game.obstacles import generate_obstacles, draw_obstacles, generate_border_blocks, draw_border_blocks
 from game.score import Score
+from game.config import Classic, Easy, Medium, Hard, Insane
+
 
 
 import random
@@ -30,8 +32,19 @@ def gameLoop():
     game_close = False
 
     # Get the difficulty level from the start menu
-    difficulty = start_menu()
+    selected_difficulty, selected_theme = start_menu()
 
+    # Initialize the difficulty
+    if selected_difficulty == "Classic":
+        difficulty = Classic()
+    elif selected_difficulty == "Easy":
+        difficulty = Easy()
+    elif selected_difficulty == "Medium":
+        difficulty = Medium()
+    elif selected_difficulty == "Hard":
+        difficulty = Hard()
+    elif selected_difficulty == "Insane":
+        difficulty = Insane()
 
     # Initialize the score manager
     score_manager = Score()
@@ -50,7 +63,11 @@ def gameLoop():
     # Initialize the current direction
     current_direction = None
 
-    border_blocks = generate_border_blocks(snake_block)
+    # Generate obstacles if not in Classic Mode
+    if selected_difficulty != "Classic":
+        border_blocks = generate_border_blocks(snake_block)
+    else:
+        border_blocks = []
 
     # Function to generate food position
     def generate_food():
@@ -73,6 +90,7 @@ def gameLoop():
 
         while game_close:
             game_over_message()
+            display_score(length_of_snake - 1, high_score)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_over = True
@@ -121,13 +139,6 @@ def gameLoop():
             game_close = True
         x1 += x1_change
         y1 += y1_change
-        dis.fill(blue)
-
-        # Draw the food
-        pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
-
-        draw_obstacles(obstacles, snake_block)
-        draw_border_blocks(border_blocks, snake_block)
 
         # Update the snake's position
         snake_head = []
@@ -149,12 +160,6 @@ def gameLoop():
         if (x1, y1) in obstacles:
             game_close = True
 
-        our_snake(snake_block, snake_list)
-        display_score(length_of_snake - 1, high_score)
-
-
-        pygame.display.update()
-
         if x1 == foodx and y1 == foody:
             length_of_snake += 1
 
@@ -164,12 +169,37 @@ def gameLoop():
                 score_manager.add_score(difficulty.__class__.__name__, high_score)
 
             # Regenerate obstacles and add one new obstacle
-            if len(obstacles) < 150:
+            if len(obstacles) < 150 and selected_difficulty != "Classic":
                 new_num_obstacles = min(len(obstacles) + 1, 150)
                 new_obstacles = generate_obstacles(snake_block, snake_list, new_num_obstacles)
                 if new_obstacles:
                     obstacles = new_obstacles
+
+            # Speed up the snake as it gets longer in Classic Mode
+            if selected_difficulty == "Classic":
+                difficulty.speed += 0.3
+
             foodx, foody = generate_food()
+            
+        # Warp the snake to the other side of the screen in Classic Mode
+        if difficulty.isBorder == False:
+            if x1 >= dis_width:
+                x1 = 0
+            elif x1 < 0:
+                x1 = dis_width - snake_block
+            if y1 >= dis_height:
+                y1 = 50  # Warp to just below the banner
+            elif y1 < 50:
+                y1 = dis_height - snake_block
+
+        dis.fill(themes[selected_theme]["background"])
+        pygame.draw.rect(dis, themes[selected_theme]["food"], [foodx, foody, snake_block, snake_block])
+        our_snake(snake_block, snake_list, themes[selected_theme]["snake"])
+        draw_obstacles(obstacles, snake_block, themes[selected_theme]["obstacle"])
+        draw_border_blocks(border_blocks, snake_block, themes[selected_theme]["border"])
+
+        display_score(length_of_snake - 1, high_score)
+        pygame.display.update()
 
         clock.tick(difficulty.speed)
 

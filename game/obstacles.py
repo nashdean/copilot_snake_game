@@ -26,9 +26,9 @@ def generate_border_blocks(snake_block):
 
     return border_blocks
 
-def draw_border_blocks(border_blocks, snake_block):
+def draw_border_blocks(border_blocks, snake_block, border_color):
     for block in border_blocks:
-        pygame.draw.rect(dis, dark_blue, [block[0], block[1], snake_block, snake_block])
+        pygame.draw.rect(dis, border_color, [block[0], block[1], snake_block, snake_block])
 
 def generate_obstacles(snake_block, snake_list, num_obstacles):
     obstacles = []
@@ -47,6 +47,6 @@ def generate_obstacles(snake_block, snake_list, num_obstacles):
             obstacles.append((obstacle_x, obstacle_y))
     return obstacles
 
-def draw_obstacles(obstacles, snake_block):
+def draw_obstacles(obstacles, snake_block, obstacle_color):
     for obstacle in obstacles:
-        pygame.draw.rect(dis, red, [obstacle[0], obstacle[1], snake_block, snake_block])
+        pygame.draw.rect(dis, obstacle_color, [obstacle[0], obstacle[1], snake_block, snake_block])
