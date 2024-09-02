@@ -1,11 +1,11 @@
 import pygame
 import time
 import random
-from game.display import dis, clock, dis_width, dis_height, start_menu, message
+from game.display import dis, clock, dis_width, dis_height, start_menu, message, game_over_message
 from game.colors import black, red, blue, green, white
 from game.snake import our_snake
 from game.fonts import display_score
-from game.obstacles import generate_obstacles, draw_obstacles
+from game.obstacles import generate_obstacles, draw_obstacles, generate_border_blocks, draw_border_blocks
 from game.score import Score
 
 
@@ -32,6 +32,7 @@ def gameLoop():
     # Get the difficulty level from the start menu
     difficulty = start_menu()
 
+
     # Initialize the score manager
     score_manager = Score()
 
@@ -49,12 +50,14 @@ def gameLoop():
     # Initialize the current direction
     current_direction = None
 
+    border_blocks = generate_border_blocks(snake_block)
+
     # Function to generate food position
     def generate_food():
         while True:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(50, dis_height - snake_block) / 10.0) * 10.0  # Avoid banner area
-            if [foodx, foody] not in snake_list and (foodx, foody) not in obstacles:
+            if [foodx, foody] not in snake_list and (foodx, foody) not in obstacles and (foodx, foody) not in border_blocks:
                 return foodx, foody
 
     # Generate obstacles based on the difficulty level
@@ -69,17 +72,26 @@ def gameLoop():
     while not game_over:
 
         while game_close:
-            dis.fill(blue)
-            message("You Lost! Press Q-Quit or C-Play Again", red)
-            display_score(length_of_snake - 1, high_score)
-            pygame.display.update()
-
+            game_over_message()
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_over = True
+                    game_close = False
+                    # Save the score if the game is over
+                    score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1)
+
+                    pygame.quit()
+                    quit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         game_over = True
                         game_close = False
-                    if event.key == pygame.K_c:
+                        # Save the score if the game is over
+                        score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1)
+
+                        pygame.quit()
+                        quit()
+                    if event.key == pygame.K_r:
                         gameLoop()
 
         for event in pygame.event.get():
@@ -115,6 +127,7 @@ def gameLoop():
         pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
 
         draw_obstacles(obstacles, snake_block)
+        draw_border_blocks(border_blocks, snake_block)
 
         # Update the snake's position
         snake_head = []
@@ -128,13 +141,12 @@ def gameLoop():
             if x == snake_head:
                 game_close = True
         
-        # Check for collision with obstacles
-        for obstacle in obstacles:
-            if x1 == obstacle[0] and y1 == obstacle[1]:
-                game_close = True
-        
-        # Check for collision with the banner
-        if y1 < banner_height:
+        # Check for collisions with border blocks
+        if (x1, y1) in border_blocks:
+            game_close = True
+
+        # Check for collisions with obstacles
+        if (x1, y1) in obstacles:
             game_close = True
 
         our_snake(snake_block, snake_list)
@@ -144,7 +156,6 @@ def gameLoop():
         pygame.display.update()
 
         if x1 == foodx and y1 == foody:
-            foodx, foody = generate_food()
             length_of_snake += 1
 
             # Update the high score if the current score is higher
@@ -158,6 +169,7 @@ def gameLoop():
                 new_obstacles = generate_obstacles(snake_block, snake_list, new_num_obstacles)
                 if new_obstacles:
                     obstacles = new_obstacles
+            foodx, foody = generate_food()
 
         clock.tick(difficulty.speed)
 

@@ -2,7 +2,7 @@
 Manages the display and rendering.
 """
 import pygame
-from game.colors import black, blue
+from game.colors import black, blue, red, white
 from game.config import Easy, Medium, Hard, Insane
 
 
@@ -24,6 +24,12 @@ score_font = pygame.font.SysFont(None, 35)
 def message(msg, color, y_offset=0):
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 6, dis_height / 3 + y_offset])
+
+def game_over_message():
+    dis.fill(black)
+    message("Game Over!", red, -50)
+    message("Press R to Restart or Q to Quit", white, 50)
+    pygame.display.update()
 
 def start_menu():
     menu = True
