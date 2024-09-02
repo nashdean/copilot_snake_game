@@ -29,7 +29,7 @@ import pygame
 from game.fonts import Text
 
 class Slider:
-    def __init__(self, x, y, width, height, options, primary_color, secondary_color, text_color):
+    def __init__(self, x, y, width, height, options, primary_color, secondary_color, text_color, name=""):
         self.x = x
         self.y = y
         self.width = width
@@ -39,6 +39,7 @@ class Slider:
         self.secondary_color = secondary_color
         self.text_color = text_color
         self.selected_index = 0  # Initialize selected_index
+        self.name = Text(name, 20, text_color)  # Initialize name as a Text object
 
     def handle_event(self, event):
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -51,6 +52,23 @@ class Slider:
 
     def draw(self, surface):
         option_width = self.width // len(self.options)
+        
+        # Draw the name on the left of the slider
+        name_width, name_height = self.name.get_size()
+        name_x = self.x - name_width - 10  # 10 pixels padding from the slider
+        name_y = self.y + (self.height - name_height) // 2
+        
+        # Set the name text color to the same as the labels on the slider
+        self.name.color = self.text_color
+        
+        # Draw the border around the name text
+        border_rect = pygame.Rect(name_x - 5, name_y - 5, name_width + 10, name_height + 10)
+        pygame.draw.rect(surface, self.secondary_color, border_rect)
+        
+        # Draw the name text
+        self.name = Text(self.name.text, 20, self.name.color) 
+        self.name.draw(surface, name_x, name_y)
+        
         for i, option in enumerate(self.options):
             color = self.primary_color if i == self.selected_index else self.secondary_color
             option_x = self.x + i * option_width
@@ -130,9 +148,9 @@ def animate_snake_menu(snake_block, snake_list, foodx, foody, x1_change, y1_chan
 
 def start_menu():
     menu = True
-    theme_slider = Slider(100, 200, 600, 50, ["default", "light", "dark"], blue, white, black)
-    difficulty_slider = Slider(100, 300, 600, 50, ["Classic", "Easy", "Medium", "Hard", "Insane"], blue, white, black)
-    border_slider = Slider(100, 400, 600, 50, ["Yes", "No"], blue, white, black)
+    theme_slider = Slider(100, 200, 600, 50, ["default", "light", "dark"], blue, white, black, name="Theme")
+    difficulty_slider = Slider(100, 300, 600, 50, ["Classic", "Easy", "Medium", "Hard", "Insane"], blue, white, black, name="Difficulty")
+    border_slider = Slider(100, 400, 600, 50, ["Yes", "No"], blue, white, black, name="Border")
     
     # Initialize snake and food positions
     snake_block = 10
@@ -154,6 +172,7 @@ def start_menu():
 
             theme_slider.handle_event(event)
             difficulty_slider.handle_event(event)
+            border_slider.handle_event(event)
 
         # Get the selected theme
         selected_theme = theme_slider.options[theme_slider.selected_index]
@@ -171,10 +190,15 @@ def start_menu():
         difficulty_slider.secondary_color = theme_colors["slider_secondary"]
         difficulty_slider.text_color = theme_colors["text"]
 
+        border_slider.primary_color = theme_colors["slider_primary"]
+        border_slider.secondary_color = theme_colors["slider_secondary"]
+        border_slider.text_color = theme_colors["text"]
+
         # Draw the message and sliders with the theme colors
         message("Snake Game", theme_colors["snake"], -100, outline_color=theme_colors["food"], outline_thickness=2)
         theme_slider.draw(dis)
         difficulty_slider.draw(dis)
+        border_slider.draw(dis)
 
         # Animate the snake in the menu
         foodx, foody, x1_change, y1_change, current_direction, snake_list = animate_snake_menu(
@@ -186,4 +210,6 @@ def start_menu():
 
     selected_theme = theme_slider.options[theme_slider.selected_index]
     selected_difficulty = difficulty_slider.options[difficulty_slider.selected_index]
-    return selected_difficulty, selected_theme
+    selected_is_border = border_slider.options[border_slider.selected_index]
+
+    return selected_difficulty, selected_theme, selected_is_border == "Yes"

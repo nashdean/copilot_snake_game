@@ -32,7 +32,7 @@ def gameLoop():
     game_close = False
 
     # Get the difficulty level from the start menu
-    selected_difficulty, selected_theme = start_menu()
+    selected_difficulty, selected_theme, selected_is_Border = start_menu()
 
     # Initialize the difficulty
     if selected_difficulty == "Classic":
@@ -64,7 +64,7 @@ def gameLoop():
     current_direction = None
 
     # Generate obstacles if not in Classic Mode
-    if selected_difficulty != "Classic":
+    if selected_is_Border:
         border_blocks = generate_border_blocks(snake_block)
     else:
         border_blocks = []
@@ -84,19 +84,19 @@ def gameLoop():
     foodx, foody = generate_food()
 
     # Get the initial high score for the current difficulty
-    high_score = score_manager.get_high_score(difficulty.__class__.__name__)
+    high_score = score_manager.get_high_score(difficulty.__class__.__name__, selected_is_Border)
 
     while not game_over:
 
         while game_close:
             game_over_message()
-            display_score(length_of_snake - 1, high_score)
+            display_score(score_manager.current_score, high_score)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_over = True
                     game_close = False
                     # Save the score if the game is over
-                    score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1)
+                    score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1, selected_is_Border)
 
                     pygame.quit()
                     quit()
@@ -105,7 +105,7 @@ def gameLoop():
                         game_over = True
                         game_close = False
                         # Save the score if the game is over
-                        score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1)
+                        score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1, selected_is_Border)
 
                         pygame.quit()
                         quit()
@@ -162,11 +162,12 @@ def gameLoop():
 
         if x1 == foodx and y1 == foody:
             length_of_snake += 1
+            score_manager.increase_current_score()
 
             # Update the high score if the current score is higher
             if length_of_snake - 1 > high_score:
                 high_score = length_of_snake - 1
-                score_manager.add_score(difficulty.__class__.__name__, high_score)
+                score_manager.add_score(difficulty.__class__.__name__, high_score, selected_is_Border)
 
             # Regenerate obstacles and add one new obstacle
             if len(obstacles) < 150 and selected_difficulty != "Classic":
@@ -182,7 +183,7 @@ def gameLoop():
             foodx, foody = generate_food()
             
         # Warp the snake to the other side of the screen in Classic Mode
-        if difficulty.isBorder == False:
+        if selected_is_Border == False:
             if x1 >= dis_width:
                 x1 = 0
             elif x1 < 0:
@@ -198,13 +199,13 @@ def gameLoop():
         draw_obstacles(obstacles, snake_block, themes[selected_theme]["obstacle"])
         draw_border_blocks(border_blocks, snake_block, themes[selected_theme]["border"])
 
-        display_score(length_of_snake - 1, high_score)
+        display_score(score_manager.current_score, high_score)
         pygame.display.update()
 
         clock.tick(difficulty.speed)
 
     # Save the score if the game is over
-    score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1)
+    score_manager.add_score(difficulty.__class__.__name__, length_of_snake - 1, selected_is_Border)
 
     pygame.quit()
     quit()
